@@ -4,6 +4,29 @@ import sys, os
 from math import log as LOG
 from scapy.all import *
 
+
+def protocol_name(pkt):
+    type_field = pkt[0].type
+    if(type_field == 2048):
+    	return "IP"
+    if(type_field == 2054):
+    	return "ARP"
+    else:
+    	#pongo otro porque no se que otros protocolos pueden ocurrir, hay que cargarlos a mano 
+    	#o ver si existe una funcion de scapy que les ponga nombre (no encontre todavia)
+    	return "otro"
+
+def cast_type(pkt):
+	dst_address = pkt[0].dst 
+	#hay que chequear si esto esta bien
+	if(dst_address == "ff:ff:ff:ff:ff:ff"):
+		return "broadcast"
+	else:
+		return "unicast"
+
+
+
+
 def MostrarNodosDistinguidos(source):
 	H = 0
 	N = sum(source.values())
@@ -21,32 +44,38 @@ def MostrarNodosDistinguidos(source):
 		print a +"\t"+ ("%.5f" % (i-H)) + "\t" + ("*" if i-H < 0 else "")
 
 def entropy_callback(pkt):
+
 	try:
-		if pkt[ARP].op == 1: #who-has (request)
-			if pkt[ARP].psrc not in wh_src: wh_src[pkt[ARP].psrc]=0
-			wh_src[pkt[ARP].psrc]+=1
-			if pkt[ARP].pdst not in wh_dst: wh_dst[pkt[ARP].pdst]=0
-			wh_dst[pkt[ARP].pdst]+=1
+		#creo tupla <destino, protocolo>
+		simbolo = (cast_type(pkt), protocol_name(pkt))
+		simbolo = str(simbolo)
+		#cuento apariciones de cada tipo de tupla
+		if simbolo not in fuente: fuente[simbolo]=0
+		fuente[simbolo] += 1
 
-		if pkt[ARP].op == 2: #is-at (response)
-			if pkt[ARP].psrc not in ia_src: ia_src[pkt[ARP].psrc]=0
-			ia_src[pkt[ARP].psrc]+=1
-			if pkt[ARP].pdst not in ia_dst: ia_dst[pkt[ARP].pdst]=0
-			ia_dst[pkt[ARP].pdst]+=1
+		
 	except:
-		return
-
+	 	return
+	
 	os.system("clear")
-	MostrarNodosDistinguidos(wh_dst)
-	MostrarNodosDistinguidos(wh_src)
+
+	
+
+	
+	MostrarNodosDistinguidos(fuente)
+	#MostrarNodosDistinguidos(wh_dst)
+	#MostrarNodosDistinguidos(wh_src)
 	#MostrarNodosDistinguidos(ia_dst)
 	#MostrarNodosDistinguidos(ia_src)
 
-wh_src = {}
-wh_dst = {}
-ia_src = {}
-ia_dst = {}
 
-sniff(prn=entropy_callback, filter="arp")
+fuente = {} 
+#wh_src = {}
+#wh_dst = {}
+#ia_src = {}
+#ia_dst = {}
+
+#no filtro por arp
+sniff(prn=entropy_callback)
 
 
