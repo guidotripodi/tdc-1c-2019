@@ -1,0 +1,20 @@
+Ya que el modelado de la fuente tiene que usar sı́mbolos que se hallen hasta los paquetes de capa 3, se
+pueden utilizar las direcciones MAC, IP y los distintos mensajes ARP que se encuentren en los paquetes.
+Un sı́mbolo será distinguido cuando sobresalga del resto en términos de la información que provee.
+Con lo cual, al querer distinguir hosts de routers, buscamos sı́mbolos que los evidencien mediante su baja
+probabilidad de aparición. Como dato a tener en cuenta, las redes capturadas poseen la caracterı́stica en
+común de que son usadas por sus hosts para el acceso casi exclusivo a internet, siendo la comunicación
+local, casi despreciable. Esto nos permite inferir que la comunicación dentro de las mismas serán mayor-
+mente entre los host y el default-gateway, generando la hipótesis de que dentro de los IPs de la red, el del
+default-gateway será la más consultada por los dispositivos.
+Dentro de los mensajes ARP distinguimos a las operaciones ”who-has” y ”is-at”, siendo la segunda la
+contestación de la primera. Tomando los ARP ”who-has”, según nuestra hipótesis, el destinatario que más
+veces se repita deberá ser el router default-gateway. No obstante, si uno de estos host esta consumiendo
+muchos datos (descarga de datos), distorsionarı́a la métrica.
+Lo que se plantea entonces es utilizar todos los paquetes ARP y considerar un sı́mbolo de la fuente
+como cada IP que aparezca en los paquetes (por cada paquete aparecen 2 sı́mbolos). Esto quiere decir que si
+modelamos a cada dispositivo como un nodo de un grafo y las comunicaciones desde y hasta ese dispositivo
+como una arista, entonces estarı́amos utilizando el grado del nodo como cantidad de repeticiones dentro de
+una muestra.
+Como estamos asumiendo que el router va a poseer la IP de mayor presencia, le estarı́amos dando
+mayor distinción a los host a nivel información.
