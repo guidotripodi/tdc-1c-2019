@@ -3,8 +3,36 @@
 import sys, os
 from math import log as LOG
 from scapy.all import *
-
+import math
+import csv
+import os
 tramas = 0
+
+
+class CsvPrinter():
+    def __init__(self, source, nPackets):
+        self.source = source
+        self.packetCount = nPackets
+        self.sourceRows = list(map(lambda (protocol, count):
+            (protocol, P(count, self.packetCount), I(P(count, self.packetCount))),
+            self.source.sourceCount.iteritems()))
+         
+    def createCSV(self, pcapFilename):
+		directory = "tables/"
+
+		if not os.path.exists(directory):
+			os.makedirs(os.path.dirname(directory))	
+
+		folders = pcapFilename.split('/')
+		input_file_name = folders[len(folders) - 1]
+		fileName = directory + input_file_name.split('.')[0] + "_" + self.source.name().replace(" ", "") + ".csv"
+		with open(fileName, 'wb') as myfile:
+			wr = csv.writer(myfile, quoting=csv.QUOTE_ALL)
+			wr.writerow(('Simbolo', 'Probabilidad', 'Informacion'))
+			for item in self.sourceRows:
+				wr.writerow(item)
+			wr.writerow(('Entropia de la fuente', self.source.entropy))
+			wr.writerow(('Entropia Máxima', self.source.maxEntropy))
 
 def protocol_name(pkt):
     type_field = pkt[Ether].type
@@ -71,21 +99,6 @@ def entropy_callback(pkt):
 
 fuente = {} 
 
-
-#no filtro por arp
-sniff(prn=entropy_callback)
-
-
-'''
-Source2 tiene que aportar la suficiente informacion como para poder distingir hosts a traves de los paquetes ARP: 
-Los paquetes ARP pueden ser de operacion who-has o is-at, siendo la segunda la respuesta de la primera. Se tomara como supuesto
-que el nodo cuya IP va a ser mas solicitada por who-has va a tener que ser la del default-gateway, ya que las redes analizadas mayormente
-se usan para el acceso a internet (minimizamos totalmente los mensajes ARP entre hosts de la misma red)
-
-Distinguir simbolos:
-La metadata se guarda en forma de tupla (ipsrc , ipdst) del mensaje who-has, pero cada simbolo es solamente ipdst ya que estamos tratando de distinguir al router
-para asi distinguir a los hosts
-'''
 class Source2():
 
 	def __init__(self, pcap):
@@ -103,3 +116,26 @@ class Source2():
 
 	def name(self):
 		return "Fuente 2"
+
+
+
+#no filtro por arp
+sniff(prn=entropy_callback)
+
+
+if __name__ == "__main__":
+
+	S2 = Source2(pcap)
+	csv2 = CsvPrinter(S2, len(pcap))
+	csv2.createCSV(args.file)
+
+'''
+Source2 tiene que aportar la suficiente informacion como para poder distingir hosts a traves de los paquetes ARP: 
+Los paquetes ARP pueden ser de operacion who-has o is-at, siendo la segunda la respuesta de la primera. Se tomara como supuesto
+que el nodo cuya IP va a ser mas solicitada por who-has va a tener que ser la del default-gateway, ya que las redes analizadas mayormente
+se usan para el acceso a internet (minimizamos totalmente los mensajes ARP entre hosts de la misma red)
+
+Distinguir simbolos:
+La metadata se guarda en forma de tupla (ipsrc , ipdst) del mensaje who-has, pero cada simbolo es solamente ipdst ya que estamos tratando de distinguir al router
+para asi distinguir a los hosts
+'''
