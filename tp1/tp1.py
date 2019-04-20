@@ -3,6 +3,7 @@
 import sys, os
 from math import log as LOG
 from scapy.all import *
+import argparse
 import math
 import csv
 import os
@@ -32,7 +33,7 @@ class CsvPrinter():
 			for item in self.sourceRows:
 				wr.writerow(item)
 			wr.writerow(('Entropia de la fuente', self.source.entropy))
-			wr.writerow(('Entropia Máxima', self.source.maxEntropy))
+			wr.writerow(('Entropia Maxima', self.source.maxEntropy))
 
 def protocol_name(pkt):
     type_field = pkt[Ether].type
@@ -124,7 +125,12 @@ sniff(prn=entropy_callback)
 
 
 if __name__ == "__main__":
-
+	#Parse command line arguments
+	parser = argparse.ArgumentParser(description='Script for analizing network packets.')
+	parser.add_argument("file", help="Pcap formatted capture")            
+	args = parser.parse_args()                                            
+            
+	pcap = rdpcap(args.file)
 	S2 = Source2(pcap)
 	csv2 = CsvPrinter(S2, len(pcap))
 	csv2.createCSV(args.file)
