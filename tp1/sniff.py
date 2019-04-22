@@ -11,7 +11,7 @@ if len(sys.argv) == 3:
 
     ftm="YYYYBBDDHHSS"
     d1 = datetime.now()
-    paquetes = sniff( iface=sys.argv[1],store=1, timeout = 15000)
+    paquetes = sniff( iface=sys.argv[1],store=1, timeout = 500)
     d2 = datetime.now()
 
     diff = d2 - d1

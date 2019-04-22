@@ -7,6 +7,7 @@ import argparse
 import math
 import csv
 import os
+import collections
 tramas = 0
 
 
@@ -111,9 +112,9 @@ class Source2():
 			S2.append(packet.pdst)
 			S2.append(packet.psrc)
 
-		self.sourceCount = Counter(S2)
+		self.sourceCount = collections.Counter(S2)
 		self.entropy = reduce((lambda x, v: x + Ei(v, len(arpPackets))), self.sourceCount.itervalues(), 0)
-		self.maxEntropy = log(len(self.sourceCount.keys()), 2) 
+		self.maxEntropy = 0 if len(self.sourceCount.keys()) == 0 else math.log(len(self.sourceCount.keys()), 2) 
 
 	def name(self):
 		return "Fuente 2"
@@ -121,7 +122,7 @@ class Source2():
 
 
 #no filtro por arp
-sniff(prn=entropy_callback)
+#sniff(prn=entropy_callback)
 
 
 if __name__ == "__main__":
