@@ -3,7 +3,6 @@
 
 from math import log as LOG
 import argparse 
-#from helpers import * 
 from scapy.all import rdpcap                                              
 from scapy.all import *
 from sets import Set
@@ -11,10 +10,8 @@ from collections import Counter
 import math
 import csv
 import os
-from helpers import expand
 from collections import Counter
 from math import log
-from helpers import Ei
 import plotly.plotly as py
 tramas = 0
 

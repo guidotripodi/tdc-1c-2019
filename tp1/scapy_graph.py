@@ -1,8 +1,7 @@
 #! /usr/bin/env python2.7
 import argparse
-from tp1 import saveFigure
+from tp1 import *
 from plotter import Plotter
-from sources import * 
 from scapy.all import rdpcap
 
 if __name__ == "__main__":
@@ -12,12 +11,6 @@ if __name__ == "__main__":
 	args = parser.parse_args()
 
 	pcap = rdpcap(args.file)
-	S1 = Source1(pcap)
-	plotter = Plotter(S1)
-    
-	saveFigure(plotter.probabilityPlot(),args.file, 1)
-	saveFigure(plotter.informationPlot(),args.file, 1)
-	saveFigure(plotter.distributionPlot(),args.file, 1)
 
 	S2 = Source2(pcap)
 	plotter = Plotter(S2)

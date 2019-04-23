@@ -5,8 +5,9 @@ from sets import Set
 import matplotlib.pyplot as plt
 import networkx as nx
 import collections
-from scapy.all import rdpcap                                              
-from sources import Source2
+from scapy.all import rdpcap 
+from scapy.all import *                                             
+from tp1 import Source2
 
 '''
  
