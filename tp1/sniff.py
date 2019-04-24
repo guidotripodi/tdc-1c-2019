@@ -11,7 +11,8 @@ if len(sys.argv) == 3:
 
     ftm="YYYYBBDDHHSS"
     d1 = datetime.now()
-    paquetes = sniff( iface=sys.argv[1],store=1, timeout = 15000)
+    # el parametro count es el maximo de paquetes que queremos capturar. Para los ejs nos piden > 10.000
+    paquetes = sniff(count = 100, iface=sys.argv[1],store=1, timeout = 100)
     d2 = datetime.now()
 
     diff = d2 - d1
