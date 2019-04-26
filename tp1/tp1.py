@@ -12,7 +12,7 @@ import csv
 import os
 from collections import Counter
 from math import log
-import plotly.plotly as py
+#import plotly.plotly as py
 tramas = 0
 
 
@@ -21,7 +21,7 @@ class CsvPrinter():
         self.source = source
         self.packetCount = nPackets
         self.sourceRows = list(map(lambda (protocol, count):
-            (protocol, P(count, self.packetCount), I(P(count, self.packetCount))),
+            (protocol, P(count, self.source.N), I(P(count, self.packetCount))),
             self.source.sourceCount.iteritems()))
          
     def createCSV(self, pcapFilename):
@@ -60,7 +60,7 @@ class Source1():
                 self.nUnicastMessages += 1
 
             S1.append(str((fstTupla, protocol)).replace("'", ""))
-
+        self.N = len(S1)
         self.sourceCount = Counter(S1)
         self.entropy = reduce((lambda x, v: x + Ei(v, len(pcap))), self.sourceCount.itervalues(), 0)
         self.maxEntropy = math.log(len(self.sourceCount.keys()), 2) 
@@ -75,10 +75,11 @@ class Source2():
 		S2 = []
                 arpPackets = pcap[ARP]
 		for packet in arpPackets:
-			self.metadata.append((packet.psrc, packet.pdst))
+			#self.metadata.append((packet.psrc, packet.pdst))
 			S2.append(packet.pdst)
 			S2.append(packet.psrc)
 
+		self.N = len(S2)
 		self.sourceCount = collections.Counter(S2)
 		self.entropy = reduce((lambda x, v: x + Ei(v, len(arpPackets))), self.sourceCount.itervalues(), 0)
 		self.maxEntropy = 0 if len(self.sourceCount.keys()) == 0 else math.log(len(self.sourceCount.keys()), 2) 
