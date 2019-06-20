@@ -2,15 +2,25 @@ import numpy as np
 import scipy.stats as stats
 
 def detectOutliers(jumps):
-    outliers = cimbala(jumps)
+    outliers, cimbala_data, punto_de_corte = cimbala(jumps.copy())
 
     print("jumps (rtt diffs): " + str(jumps))
     print("outliers by jumps: " + str(outliers))
-    
+    print("cimbala_data: " + str(cimbala_data))
+    print("punto_de_corte: " + str(punto_de_corte))
+
     return outliers
 
 def cimbala(rttDifs):
     outliers = []
+
+    cimbala_data = []
+    mean_or = np.mean(rttDifs)
+    standardDeviation_or = np.std(rttDifs)
+    punto_de_corte = mean_or + standardDeviation_or
+    for rttDif in rttDifs:
+        cimbala_data.append((np.absolute(rttDif - mean_or)) / standardDeviation_or)
+
     if len(rttDifs) > 0:
         keepLooking = True
         while keepLooking:
@@ -30,7 +40,7 @@ def cimbala(rttDifs):
                 outliers.append(outlier)
                 keepLooking = True
 
-    return outliers
+    return outliers, cimbala_data, punto_de_corte
 
 
 def thompsonGamma(rtts):

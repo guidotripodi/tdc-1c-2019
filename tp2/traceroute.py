@@ -11,7 +11,7 @@ class TraceRoute():#MethodObject jajaja
         self.burstSize = 30
         self.retryNumber = 3
         self.timeout = 0.5#segs?
-        self.maxTtl = 30
+        self.maxTtl = 25
         self.destination = sp.Net(dst)
         self.echoRequests = sp.IP(dst=self.destination, ttl=(1,self.maxTtl)) / sp.ICMP()
         self.traced = []
@@ -32,13 +32,13 @@ class TraceRoute():#MethodObject jajaja
                     rtt = (endTime - initTime)*1000 # time() es en segundos.
                     if response is not None:
                         responses.append((response.src, rtt))
-                        destinationReached = self.destination == response.src 
+                        destinationReached = self.destination == response.src
                         break
 
             hop, rttToHop = self.analyzeResponses(responses)
 
             self.traced.append({"rtt":rttToHop, "ip_address":hop, "salto_internacional":None, "hop_num":hopCount})
-            hopCount = hopCount + 1 
+            hopCount = hopCount + 1
             if destinationReached:
                 break
 
@@ -53,14 +53,14 @@ class TraceRoute():#MethodObject jajaja
                 hopsWithoutRTT.append(self.traced.index(hop))
             else:
                 total += hop["rtt"]
-        
+
         prom = total/count
 
-        self.cimbalaTraced = deepcopy(self.traced) 
+        self.cimbalaTraced = deepcopy(self.traced)
         for index in hopsWithoutRTT:
             hop = self.cimbalaTraced[index]
             hop["rtt"] = prom
-                
+
         self.calculateInternationalJumps()
 
     def calculateInternationalJumps(self):
@@ -77,12 +77,12 @@ class TraceRoute():#MethodObject jajaja
                 jumps.append(jump)
 
             lastNode = node
-        
+
         outliers = cb.detectOutliers(jumps)
         for node in self.traced:
             if node["rtt"] is not None:
                 isInternational = jumpRTTByHop[node["ip_address"]] in outliers
-                node["salto_internacional"] = isInternational 
+                node["salto_internacional"] = isInternational
 
 
     def analyzeResponses(self, responses):
